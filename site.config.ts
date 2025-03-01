@@ -2,24 +2,23 @@ import { siteConfig } from './lib/site-config'
 
 export default siteConfig({
   // the site's root Notion page (required)
-  rootNotionPageId: '5524362154d14d4b91858209eea2e117',
+  rootNotionPageId: '68eb71fc56404cbb915eb22bb15a4fea',
 
   // if you want to restrict pages to a single notion workspace (optional)
   // (this should be a Notion ID; see the docs for how to extract this)
   rootNotionSpaceId: null,
 
   // basic site info (required)
-  name: 'Sanjeed',
-  domain: 'sanjeed.in',
-  author: 'Sanjeed',
+  name: 'Anuj',
+  domain: 'https://anujkhandalikar1.notion.site/Hello-I-m-Anuj-68eb71fc56404cbb915eb22bb15a4fea',
+  author: 'Anuj',
 
   // open graph metadata (optional)
-  description: 'Sanjeed\'s home on the internet',
+  description: 'Anuj\'s home on the internet',
 
   // social usernames (optional)
-  twitter: 'sanjeed_i',
-  github: 'sanjeed5',
-  linkedin: 'mohammed-sanjeed',
+  twitter: 'realkhandalikar',
+  linkedin: 'anuj-khandalikar-88ab5a158',
   // mastodon: '#', // optional mastodon profile URL, provides link verification
   // newsletter: '#', // optional newsletter URL
   // youtube: '#', // optional youtube channel name or `channel/UCGbXXXXXXXXXXXXXXXXXXXXXX`
