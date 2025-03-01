@@ -37,3 +37,4 @@ yarn-error.log*
 
 # vercel
 .vercel
+.wrangler/tmp/pages-Efb96R/__next-on-pages-dist__/cache/adaptor.js

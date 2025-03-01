@@ -1,5 +1,4 @@
 import ky from 'ky'
-import lqip from 'lqip-modern'
 import {
   type ExtendedRecordMap,
   type PreviewImage,
@@ -12,6 +11,17 @@ import pMemoize from 'p-memoize'
 import { defaultPageCover, defaultPageIcon } from './config'
 import { db } from './db'
 import { mapImageUrl } from './map-image-url'
+
+// Only import lqip-modern if not in Cloudflare environment
+let lqip: any = null
+if (typeof process !== 'undefined' && !process.env.CLOUDFLARE && !process.env.NEXT_RUNTIME) {
+  try {
+    // Dynamic import to avoid issues with Cloudflare
+    lqip = await import('lqip-modern').then(module => module.default)
+  } catch (err) {
+    console.warn('Failed to import lqip-modern', err)
+  }
+}
 
 export async function getPreviewImageMap(
   recordMap: ExtendedRecordMap
@@ -53,6 +63,29 @@ async function createPreviewImage(
       console.warn(`redis error get "${cacheKey}"`, err.message)
     }
 
+    // Check if we're in Cloudflare environment
+    if (!lqip || typeof process !== 'undefined' && (process.env.CLOUDFLARE || process.env.NEXT_RUNTIME === 'edge')) {
+      // In Cloudflare environment, return a placeholder preview image
+      console.log('Skipping lqip in Cloudflare environment', { url, cacheKey })
+      
+      // Return a simple placeholder
+      const previewImage = {
+        originalWidth: 400,
+        originalHeight: 300,
+        dataURIBase64: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFeAJ5jHBQgwAAAABJRU5ErkJggg=='
+      }
+
+      try {
+        await db.set(cacheKey, previewImage)
+      } catch (err) {
+        // ignore redis errors
+        console.warn(`redis error set "${cacheKey}"`, err.message)
+      }
+
+      return previewImage
+    }
+
+    // Only run this code in non-Cloudflare environments
     const body = await ky(url).arrayBuffer()
     const result = await lqip(body)
     console.log('lqip', { ...result.metadata, url, cacheKey })

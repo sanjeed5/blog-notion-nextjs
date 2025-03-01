@@ -1,6 +1,11 @@
 import bundleAnalyzer from '@next/bundle-analyzer'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { setupDevPlatform } from '@cloudflare/next-on-pages/next-dev';
+
+if (process.env.NODE_ENV === 'development') {
+  await setupDevPlatform();
+}
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true'
@@ -22,7 +27,7 @@ export default withBundleAnalyzer({
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;"
   },
 
-  webpack: (config, _context) => {
+  webpack: (config, { webpack, isServer }) => {
     // Workaround for ensuring that `react` and `react-dom` resolve correctly
     // when using a locally-linked version of `react-notion-x`.
     // @see https://github.com/vercel/next.js/issues/50391
@@ -32,6 +37,28 @@ export default withBundleAnalyzer({
       dirname,
       'node_modules/react-dom'
     )
+
+    // Handle node: URI scheme for Cloudflare Workers
+    if (process.env.NEXT_RUNTIME === 'edge' || process.env.CLOUDFLARE) {
+      // Add an ignore plugin for node built-in modules that aren't supported in Cloudflare
+      config.plugins.push(
+        new webpack.IgnorePlugin({
+          resourceRegExp: /^(node:child_process|node:crypto|node:os|node:path|node:stream|node:buffer|sharp|lqip-modern)$/,
+        })
+      )
+
+      // Provide polyfills for some Node.js modules
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        crypto: false,
+        stream: false,
+        os: false,
+        path: false,
+        child_process: false,
+      }
+    }
+
     return config
   },
 

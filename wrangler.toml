@@ -1,0 +1,19 @@
+# wrangler.toml
+name = "anujkhandalikar"
+compatibility_date = "2023-12-01"
+
+# Configure Cloudflare Pages
+[build]
+command = "CLOUDFLARE=true npm run build"
+
+[env.production]
+vars = { CLOUDFLARE = "true" }
+
+[env.development]
+vars = { CLOUDFLARE = "true" }
+
+# Configure KV namespace for caching
+# Uncomment and replace with your KV namespace ID if you're using KV for caching
+# [[kv_namespaces]]
+# binding = "NOTION_KV"
+# id = "your-kv-namespace-id" 

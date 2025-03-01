@@ -23,3 +23,5 @@ export default async function searchNotion(
   )
   res.status(200).json(results)
 }
+
+export const runtime = "edge";
